@@ -39,3 +39,8 @@ class WrapMe(object):
 WrappedComplex = WrapMe(3.5+4.2j)
 print("复数的虚部={}, 共轭复数={}".format(WrappedComplex.imag, WrappedComplex.conjugate()))#对已有属性的访问通过getattr()方法授权给对象
 print(WrappedComplex.get())
+
+
+#13.16新式类的高级特性
+
+#13.16.4描述符

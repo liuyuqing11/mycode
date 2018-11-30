@@ -1,7 +1,7 @@
 import re
 #正则：核心观念：正则对象、匹配对象
 #regex对象的方法：match、search;
-#匹配对象的方法：group、groups
+#匹配对象的方法：group、groups:返回包含匹配子组的元祖
 
 #一、正则表达式对象的方法
 #1.match：从字符串开始对模式进行匹配，匹配成功返回匹配对象，失败返回None
@@ -39,4 +39,13 @@ else:
     print("match fail.")#Yes Matched:bat
 
 
+#二、匹配对象的group及groups方法
+g1 = re.match('(\w\\w\w)-(\d\d\d)', 'adc-123')
+if g1 is not None:
+    print("group match resulr:{0},type is:{1}.len is:{2}".format(g1.group(), type(g1.group()), len(g1.group())))#group match resulr:adc-123,type is:<class 'str'>.len is:7
+    print("group result :{0}\{1}".format(g1.group(0), g1.group(1)))#adc-123\adc,返回了匹配的子组字符串
+
+if g1 is not None:
+    print("groups result is:{0},type is:{1},len is:{2},greops result[1] is {3}".format(g1.groups(), type(g1.groups()), len(g1.groups()),\
+                                                                                       g1.groups(3))) #groups result is:('adc', '123'),type is:<class 'tuple'>,len is:2,greops result[1] is ('adc', '123')
 

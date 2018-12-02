@@ -1,8 +1,13 @@
 import re
 #正则：核心观念：正则对象、匹配对象
+<<<<<<< HEAD
 #regex对象的方法：match（匹配）、search（搜索）|findall（搜索）、sub|subn（搜索替换）、split（分割）;
 #匹配对象的方法：group、groups:返回包含匹配子组的元祖
 #原始字符串:raw strings
+=======
+#regex对象的方法：match、search;
+#匹配对象的方法：group、groups:返回包含匹配子组的元祖
+>>>>>>> 1d9f0f145baec3ec3bfdf672a51d0676e616143b
 
 #一、正则表达式对象的方法
 #1.match：从字符串开始对模式进行匹配，匹配成功返回匹配对象，失败返回None
@@ -80,11 +85,14 @@ if g1 is not None:
 if g1 is not None:
     print("groups result is:{0},type is:{1},len is:{2},greops result[1] is {3}".format(g1.groups(), type(g1.groups()), len(g1.groups()),\
                                                                                        g1.groups(3))) #groups result is:('adc', '123'),type is:<class 'tuple'>,len is:2,greops result[1] is ('adc', '123')
+<<<<<<< HEAD
 
 #三、原始字符串
 #产生原因：ASC2字符和正则表达式特殊字符间所产生的冲突：
     #如：\b:退格键，匹配一个单词的边界，解决：用\转义但麻烦，或者用r简化
 r_1 = re.match('\bblow', 'blow')#None
 r_2 = re.match(r'\bblow', 'blow')
+=======
+>>>>>>> 1d9f0f145baec3ec3bfdf672a51d0676e616143b
 
 print("r_1.group={0},r_2.group()={1}".format('None', r_2.group()))#r_1.group=None,r_2.group()=blow

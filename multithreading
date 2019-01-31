@@ -1,0 +1,26 @@
+#多任务可由多进程完成,也可由多线程完成,一个进程至少有一个线程
+#线程是操作系统直接支持的执行单元,python的线程是真正的Posix Thread,不是模拟出来的线程.
+#Python的标准库提供了2个线程相关模块:__thread(低级模块)和threading(封装了_thread时高级模块),只需使用threading这个高级模块就可
+
+#启动一个线程=创建一个Thread实例(传入执行函数),然后调用start()开始执行.
+#新线程执行的代码段
+import threading
+import time
+def loop():
+    print('thresd %s is running...' %threading.current_thread().name)
+    n = 0
+    while n <5:
+        n= n+1
+        print('thread %s ====> %d' %(threading.current_thread().name, n))
+        time.sleep(1)
+
+    print('thread %s ended.' %threading.current_thread().name)
+
+def main():
+    print('thread %s is running...' %threading.current_thread().name)
+    child_t = threading.Thread(target = loop, )
+    child_t.start()
+    child_t.join()
+    print('thread %s ended.' % threading.current_thread().name)
+if __name__ == '__main__':
+    main()

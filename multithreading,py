@@ -1,0 +1,93 @@
+#多任务可由多进程完成,也可由多线程完成,一个进程至少有一个线程
+#线程是操作系统直接支持的执行单元,python的线程是真正的Posix Thread,不是模拟出来的线程.
+#Python的标准库提供了2个线程相关模块:__thread(低级模块)和threading(封装了_thread时高级模块),只需使用threading这个高级模块就可
+
+#启动一个线程=创建一个Thread实例(传入执行函数),然后调用start()开始执行.
+#新线程执行的代码段
+import threading
+import time
+def loop():
+    print('thresd %s is running...' %threading.current_thread().name)
+    n = 0
+    while n <5:
+        n= n+1
+        print('thread %s ====> %d' %(threading.current_thread().name, n))
+        time.sleep(1)
+
+    print('thread %s ended.' %threading.current_thread().name)
+
+def main():
+    print('thread %s is running...' %threading.current_thread().name)
+    child_t = threading.Thread(target = loop, )
+    child_t.start()
+    child_t.join()
+    print('thread %s ended.' % threading.current_thread().name)
+if __name__ == '__main__':
+    main()
+
+*******************************************************************************************************************************************************************
+#1.多线程与多进程之间的不同：
+#a.多进程和多线程之间最大的一个不同：对于同一个变量，多进程会拷贝在每一个进程中，且互不影响（相互独立）；多线程：变量由多个线程共享，任何一个变可以被多个线程修改，线程之间存在数据共享的问题
+#一个例子多线程如何把数据写乱,定义一个共享变量balance，启动2个线程先存后取，只要循环的次数够多，该共享变量的值将不是0
+    #原因分析：高级语言在执行一条语句时，其实是拆分成若干条语句执行：a = b+c-->temp = b+c;a=temp；由于修改balance是分成多条语句执行的，
+    #在试行多条语句时，可能存在线程中断->多个线程把共享变量改乱了（对于本例2个线程同时存取，就会导致最终余额不对）
+    #由于temp是局部变量，2个线程都有各自的temp,若线程1和线程2是交替执行的;
+    #t1 : temp= balance+5 =5
+    #t2： temp = balance + 10 =10
+
+    #t1： balance = temp ,5
+    #t2 : balance = temp2 =10
+
+    #t1 : temp1 =balance -5 ,5
+    #t1 : balance = temp1, 5
+#1.多线程编程模型复杂，易发生冲突，必须使用锁加以隔离，同时又要小心死锁的情况
+#解决方案：确保一个线程在修改共享变量时，别的线程不能修改：给关键代码段上锁！，在同一时刻可能存在多个线程，但只有一个线程能获得锁
+#使用锁的弊端：
+    #阻止了多线程的并发（含锁的代码段，只能以单线程模式执行），大大降低了效率；
+    #由于可能存在多个锁的情况，当不同线程持有不同锁并企图获得对方的锁时，会造成死锁情况。所有线程既不执行，也不结束（挂起），只能等待操作系统强行终止。
+#使用锁的好处：
+    #对于关键代码段，确保从头到尾只有一个线程执行。
+#2.python解释器在设计时使用了GIL全局锁，导致多线程无法利用多核，所以多线程并发（多线程实现多核任务并发）对于python来说只是一个美丽的梦。
+    #python的线程是真正的线程，但解释器在执行代码时有一个GIL(Global Interpreter Lock)锁，必须获得该锁，每执行100条字节码后自动释放该锁。
+    #GIL全局锁实际把所有多线程的代码段都给上锁了，多线程也只能交替执行。这是一个历史遗留问题，要想解决除非写一个不带GIL锁的解释器。
+    #或者可以通过多进程实现多核任务，因为多个python进程都拥有独立的GIL全局锁，互不影响。
+
+import time, threading
+
+#假定这是你的银行存款
+balance = 0
+
+def change_it(n):
+    #先存后花
+    global balance
+    balance = balance + n
+    balance =balance - n
+
+def run_thread(n):
+    for i in range(1000000):
+        change_it(n)
+def main():
+    t1 = threading.Thread(target = run_thread_safe, args = (5,))
+    t2 = threading.Thread(target = run_thread_safe, args = (10,))
+
+    t1.start()
+    t2.start()
+    t1.join()
+    t2.join()
+    print(balance)
+#创建一个锁->获得锁，修改共享变量->修改完成后，释放锁
+#创建一个锁
+lock = threading.Lock()
+def run_thread_safe(n):
+    for i in range(1000000):
+        lock.acquire()
+        try:
+            #获得锁后就放心的改吧！
+            change_it(n)
+        finally:
+            #修改完成后记得释放锁
+            lock.release()
+
+
+if __name__ == '__main__':
+    main()
